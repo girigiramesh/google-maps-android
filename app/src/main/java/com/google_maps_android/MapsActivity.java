@@ -1,8 +1,10 @@
 package com.google_maps_android;
 
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
@@ -22,7 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private EditText et_address;
-    private Button btn_search;
+    Button btn_search, btn_map_type, btn_zoom, btn_zoom_out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,28 +53,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng Sydney = new LatLng(getIntent().getDoubleExtra(Constant.extra.LATITUDE, 0), getIntent().getDoubleExtra(Constant.extra.LONGITUDE, 0));
         mMap.addMarker(new MarkerOptions().position(Sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Sydney));
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
 
     private void init() {
         et_address = (EditText) findViewById(R.id.et_address);
         btn_search = (Button) findViewById(R.id.btn_Search);
         btn_search.setOnClickListener(this);
+        btn_map_type = (Button) findViewById(R.id.btn_map_type);
+        btn_map_type.setOnClickListener(this);
+        btn_zoom = (Button) findViewById(R.id.btn_zoom);
+        btn_zoom.setOnClickListener(this);
+        btn_zoom_out = (Button) findViewById(R.id.btn_zoom_out);
+        btn_zoom_out.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        String location = et_address.getText().toString();
-        List<Address> addressList = null;
-        Geocoder coder = new Geocoder(this);
-        try {
-            addressList = coder.getFromLocationName(location, 1);
-        } catch (IOException e) {
-            e.printStackTrace();
+        switch (view.getId()) {
+            case R.id.btn_Search:
+                String location = et_address.getText().toString();
+                List<Address> addressList = null;
+                Geocoder coder = new Geocoder(this);
+                try {
+                    addressList = coder.getFromLocationName(location, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Address address = addressList != null ? addressList.get(0) : null;
+                assert address != null;
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                break;
+            case R.id.btn_map_type:
+                if (mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                } else {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
+                break;
+            case R.id.btn_zoom:
+                break;
+            case R.id.btn_zoom_out:
+                break;
         }
-        Address address = addressList != null ? addressList.get(0) : null;
-        assert address != null;
-        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 }
