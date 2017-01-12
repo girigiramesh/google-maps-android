@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -83,6 +84,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         switch (view.getId()) {
             case R.id.btn_Search:
                 String location = et_address.getText().toString();
+                if (et_address.getText().toString().length() == 0) {
+                    Toast.makeText(this, "Please enter Address..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 List<Address> addressList = null;
                 Geocoder coder = new Geocoder(this);
                 try {
@@ -104,8 +109,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.btn_zoom:
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
                 break;
             case R.id.btn_zoom_out:
+                mMap.animateCamera(CameraUpdateFactory.zoomOut());
                 break;
         }
     }
