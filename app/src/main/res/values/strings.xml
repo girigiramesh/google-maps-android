@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Google-maps-android</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_first_known_location">First known location :</string>
+    <string name="title_location_updates">Location Updates :</string>
+    <string name="toast_location_failed">Failed to get location info!</string>
+    <string name="toast_location_permission_alert">Please Give location access permissions!</string>
+    <string name="toast_location_permission_thanks">Thank you for granting location permission!</string>
 </resources>
